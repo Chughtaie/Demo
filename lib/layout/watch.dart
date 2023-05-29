@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:demo_app/component/bottom_nav_bar.dart';
+import 'package:demo_app/component/custom_search.dart';
 import 'package:demo_app/component/movie_card.dart';
 import 'package:demo_app/constants.dart';
 import 'package:demo_app/layout/watch_detail.dart';
@@ -13,7 +14,7 @@ import 'package:shimmer/shimmer.dart';
 
 class Watch extends StatefulWidget {
   static const id = 'Watch';
-  Watch({super.key});
+  const Watch({super.key});
 
   @override
   State<Watch> createState() => _WatchState();
@@ -23,31 +24,39 @@ class _WatchState extends State<Watch> {
   // initUpcomingMovies() async {
   bool searchIcon = true;
 
+  late TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController();
+  }
+
   List<String> vals = [
     'https://picsum.photos/250?image=9',
     'https://picsum.photos/250?image=9',
     'https://picsum.photos/250?image=9'
   ];
 
+  Future<Map<String, dynamic>> fetchMovieData() async {
+    final response = await GetAPI.getApi('/upcoming');
+    if (response.statusCode == 200) {
+      var decodedBody = json.decode(response.body);
+      Provider.of<MovieDataProvider>(context, listen: false)
+          .setUpcomingMovies(UpcomingMovieModel.fromJson(decodedBody));
+      return decodedBody;
+    } else {
+      throw Exception('Failed to fetch movie data');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<Map<String, dynamic>> fetchMovieData() async {
-      final response = await GetAPI.getApi('/upcoming');
-      if (response.statusCode == 200) {
-        var decodedBody = json.decode(response.body);
-        Provider.of<MovieDataProvider>(context, listen: false)
-            .setUpcomingMovies(UpcomingMovieModel.fromJson(decodedBody));
-        return decodedBody;
-      } else {
-        throw Exception('Failed to fetch movie data');
-      }
-    }
-
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(96),
+          preferredSize: const Size.fromHeight(96),
           child: Container(
-            margin: EdgeInsets.only(top: 20), // Add margin on top
+            margin: const EdgeInsets.only(top: 20), // Add margin on top
             child: AppBar(
               elevation: 0,
 
@@ -62,7 +71,6 @@ class _WatchState extends State<Watch> {
                     ? GestureDetector(
                         onTap: () {
                           setState(() {
-                            print('search');
                             searchIcon = false;
                           });
                         },
@@ -75,30 +83,13 @@ class _WatchState extends State<Watch> {
                           ),
                         ),
                       )
-                    : Expanded(
-                        child: Container(
-                          margin: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
-                          ),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.search),
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.clear),
-                                onPressed: () {
-                                  setState(() {
-                                    searchIcon = true;
-                                  });
-                                },
-                              ),
-                              border: InputBorder.none,
-                              hintText: 'Search...',
-                            ),
-                          ),
-                        ),
-                      ),
+                    : CustomSearch(
+                        controller: controller,
+                        onCancel: () {
+                          setState(() {
+                            searchIcon = true;
+                          });
+                        })
               ],
             ),
           ),
@@ -107,7 +98,7 @@ class _WatchState extends State<Watch> {
           children: [
             Expanded(
               child: Container(
-                  color: Color(0xffF6F6FA),
+                  color: const Color(0xffF6F6FA),
                   child: FutureBuilder(
                     future: fetchMovieData(),
                     builder: (context, snapshot) {
@@ -116,7 +107,8 @@ class _WatchState extends State<Watch> {
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
                           child: ListView.builder(
-                            itemBuilder: (context, index) => MovieCardShimmer(),
+                            itemBuilder: (context, index) =>
+                                const MovieCardShimmer(),
                             itemCount: 4,
                           ),
                         );
@@ -149,13 +141,13 @@ class _WatchState extends State<Watch> {
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else {
-                        return Text('No data');
+                        return const Text('No data');
                       }
                     },
                   )),
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavBar());
+        bottomNavigationBar: const BottomNavBar());
   }
 }

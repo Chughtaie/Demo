@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: Watch.id,
         routes: {
-          Watch.id: (context) => Watch(),
+          Watch.id: (context) => const Watch(),
           WatchDetail.id: (context) => WatchDetail()
         },
       ),
