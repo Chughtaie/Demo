@@ -85,6 +85,11 @@ class _WatchState extends State<Watch> {
                       )
                     : CustomSearch(
                         controller: controller,
+                        onChanged: (value) {
+                          setState(() {
+                            controller.notifyListeners();
+                          });
+                        },
                         onCancel: () {
                           setState(() {
                             searchIcon = true;
@@ -114,26 +119,25 @@ class _WatchState extends State<Watch> {
                         );
                       } else if (snapshot.hasData) {
                         return Consumer<MovieDataProvider>(
-                          builder: (context, value, child) => ListView.builder(
-                            itemBuilder: (context, index) => GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => WatchDetail(
-                                          selectedIndex: index,
-                                          movieId: value.upcomingMovies
-                                              .results![index].id),
-                                    ));
-                              },
-                              child: MovieCard(
-                                title: value.upcomingMovies.results![index]
-                                    .originalTitle!,
-                                imageUrl:
-                                    '$backDropUrl${value.upcomingMovies.results![index].backdropPath!}',
-                              ),
-                            ),
-                            itemCount: value.upcomingMovies.results!.length,
+                          builder: (context, value, child) =>
+
+                              // ? ListView.builder(
+                              //     itemBuilder: (context, index) =>
+                              //         MovieTapCard(context, index, value),
+                              //     itemCount:
+                              //         value.upcomingMovies.results!.length,
+                              //   )
+                              SingleChildScrollView(
+                            child: Column(
+                                children: value.upcomingMovies.results!
+                                    .map((e) => controller.text == ''
+                                        ? MovieTapCard(context, e)
+                                        : (e.title!
+                                                .toLowerCase()
+                                                .contains(controller.text)
+                                            ? MovieTapCard(context, e)
+                                            : SizedBox.shrink()))
+                                    .toList()),
                           ),
                         );
                       } else if (snapshot.hasError) {
@@ -147,5 +151,23 @@ class _WatchState extends State<Watch> {
           ],
         ),
         bottomNavigationBar: const BottomNavBar());
+  }
+
+  GestureDetector MovieTapCard(BuildContext context, Results e) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => WatchDetail(
+                  // selectedIndex: index,
+                  movie: e),
+            ));
+      },
+      child: MovieCard(
+        title: e.originalTitle!,
+        imageUrl: '$backDropUrl${e.backdropPath!}',
+      ),
+    );
   }
 }

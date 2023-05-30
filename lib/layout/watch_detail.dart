@@ -10,19 +10,17 @@ import 'package:demo_app/provider/movie_data_provider.dart';
 import 'package:demo_app/services/get_api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
-import 'package:flutter/services.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:flutter_randomcolor/flutter_randomcolor.dart';
+
+import '../model/upcoming_movie_model.dart';
 
 class WatchDetail extends StatefulWidget {
-  WatchDetail({super.key, selectedIndex, movieId}) {
-    index = selectedIndex;
-    idMovie = movieId;
+  WatchDetail({super.key, movie}) {
+    // index = selectedIndex;
+    moviee = movie;
   }
   static const id = 'WatchDetail';
-  int index = 0;
-  int idMovie = 0;
+  late Results moviee;
 
   @override
   State<WatchDetail> createState() => _WatchDetailState();
@@ -42,7 +40,6 @@ class _WatchDetailState extends State<WatchDetail> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    index = widget.index;
 
     fetchVideo();
     fetchGenre();
@@ -79,7 +76,7 @@ class _WatchDetailState extends State<WatchDetail> {
 
   fetchVideo() async {
     final response =
-        await GetAPI.getApiWithoutToken('movie/${widget.idMovie}/videos');
+        await GetAPI.getApiWithoutToken('movie/${widget.moviee.id}/videos');
     // print(response);
 
     for (Map i in response['results']) {
@@ -103,11 +100,7 @@ class _WatchDetailState extends State<WatchDetail> {
     genre = GenreModel.fromJson(json.decode(response.body));
     setState(() {
       for (Genres i in genre.genres!) {
-        if (Provider.of<MovieDataProvider>(context, listen: false)
-            .upcomingMovies
-            .results![widget.index]
-            .genreIds!
-            .contains(i.id)) genres.add(i.name!);
+        if (widget.moviee.genreIds!.contains(i.id)) genres.add(i.name!);
       }
     });
 
@@ -189,7 +182,7 @@ class _WatchDetailState extends State<WatchDetail> {
               style: localStyle,
             ),
             Text(
-              value.upcomingMovies.results![widget.index].overview!,
+              widget.moviee.overview!,
               style: const TextStyle(color: Colors.blueGrey),
             )
           ],
@@ -205,8 +198,7 @@ class _WatchDetailState extends State<WatchDetail> {
         children: [
           CachedNetworkImage(
             width: MediaQuery.of(context).size.width,
-            imageUrl: backDropUrl +
-                value.upcomingMovies.results![widget.index].posterPath!,
+            imageUrl: backDropUrl + widget.moviee.posterPath!,
             fit: BoxFit.fill,
             placeholder: (context, url) => const MovieCardShimmer(
                 height: 500), // Placeholder widget while loading
@@ -223,7 +215,7 @@ class _WatchDetailState extends State<WatchDetail> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'In Theaters  ${formatDate(value.upcomingMovies.results![widget.index].releaseDate!)}',
+                    'In Theaters  ${formatDate(widget.moviee.releaseDate!)}',
                     style: textStyle.copyWith(fontWeight: FontWeight.w500),
                   ),
                   CustomButton(
