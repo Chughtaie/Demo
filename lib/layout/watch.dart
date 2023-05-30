@@ -39,7 +39,7 @@ class _WatchState extends State<Watch> {
   ];
 
   Future<Map<String, dynamic>> fetchMovieData() async {
-    final response = await GetAPI.getApi('/upcoming');
+    final response = await GetAPI.getApi('movie/upcoming');
     if (response.statusCode == 200) {
       var decodedBody = json.decode(response.body);
       Provider.of<MovieDataProvider>(context, listen: false)
@@ -113,30 +113,28 @@ class _WatchState extends State<Watch> {
                           ),
                         );
                       } else if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemBuilder: (context, index) => GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => WatchDetail(
-                                      selectedIndex: index,
-                                    ),
-                                  ));
-                            },
-                            child: MovieCard(
-                              title: Provider.of<MovieDataProvider>(context)
-                                  .upcomingMovies
-                                  .results![index]
-                                  .originalTitle!,
-                              imageUrl:
-                                  '$backDropUrl${Provider.of<MovieDataProvider>(context).upcomingMovies.results![index].backdropPath!}',
+                        return Consumer<MovieDataProvider>(
+                          builder: (context, value, child) => ListView.builder(
+                            itemBuilder: (context, index) => GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => WatchDetail(
+                                          selectedIndex: index,
+                                          movieId: value.upcomingMovies
+                                              .results![index].id),
+                                    ));
+                              },
+                              child: MovieCard(
+                                title: value.upcomingMovies.results![index]
+                                    .originalTitle!,
+                                imageUrl:
+                                    '$backDropUrl${value.upcomingMovies.results![index].backdropPath!}',
+                              ),
                             ),
+                            itemCount: value.upcomingMovies.results!.length,
                           ),
-                          itemCount: Provider.of<MovieDataProvider>(context)
-                              .upcomingMovies
-                              .results!
-                              .length,
                         );
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');

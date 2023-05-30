@@ -16,7 +16,7 @@ class GetAPI {
     return response;
   }
 
-  getApiWithTokenAndWithError(String uri) async {
+  static getApiWithoutToken(String uri) async {
     final response = await http.get(Uri.parse(setUrl(uri)));
     if (response.statusCode == 200) {
       return json.decode(response.body);

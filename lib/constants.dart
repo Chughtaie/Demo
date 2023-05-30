@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 String backDropUrl = 'https://image.tmdb.org/t/p/w500';
-String api = 'https://api.themoviedb.org/3/movie';
+String api = 'https://api.themoviedb.org/3/';
 String apiKey = 'fdec09d3d837b9ebb29484b267652a23';
+String youtubeApiKey = 'AIzaSyClgaVhrTnWI9gaYVTy60pjHERjsBP-gGY';
+
 TextStyle textStyle = const TextStyle(
     color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500);
 
