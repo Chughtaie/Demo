@@ -132,11 +132,7 @@ class _WatchState extends State<Watch> {
                                 children: value.upcomingMovies.results!
                                     .map((e) => controller.text == ''
                                         ? MovieTapCard(context, e)
-                                        : (e.title!
-                                                .toLowerCase()
-                                                .contains(controller.text)
-                                            ? MovieTapCard(context, e)
-                                            : SizedBox.shrink()))
+                                        : filterMovies(e, context))
                                     .toList()),
                           ),
                         );
@@ -151,6 +147,12 @@ class _WatchState extends State<Watch> {
           ],
         ),
         bottomNavigationBar: const BottomNavBar());
+  }
+
+  Widget filterMovies(Results e, BuildContext context) {
+    return (e.title!.toLowerCase().contains(controller.text)
+        ? MovieTapCard(context, e)
+        : SizedBox.shrink());
   }
 
   GestureDetector MovieTapCard(BuildContext context, Results e) {
