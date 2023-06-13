@@ -1,9 +1,9 @@
 import 'dart:convert';
-
 import 'package:demo_app/constants.dart';
 import 'package:http/http.dart' as http;
 
 class GetAPI {
+  // Method to make an API request without a token
   getApiRequestWithoutToken(uri) async {
     String url = api + uri;
 
@@ -16,16 +16,22 @@ class GetAPI {
     return response;
   }
 
+  // Static method to make an API request without a token
   static getApiWithoutToken(String uri) async {
-    final response = await http.get(Uri.parse(setUrl(uri)));
-    if (response.statusCode == 200) {
+    try {
+      final response = await http.get(Uri.parse(setUrl(uri)));
+
+      if (response.statusCode == 200)
+        print("response successful");
+      else
+        print('response unsuccessful');
+
       return json.decode(response.body);
-    } else {
-      throw Exception('Failed to fetch movie data');
+    } catch (e) {
+      print('Socket Exceptionm');
     }
   }
 
-  static getApi(String uri) async {
-    return await http.get(Uri.parse(setUrl(uri)));
-  }
+  // Static method to make an API request
+  static getApi(String uri) async => await http.get(Uri.parse(setUrl(uri)));
 }

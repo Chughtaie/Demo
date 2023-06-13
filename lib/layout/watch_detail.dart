@@ -9,6 +9,8 @@ import 'package:demo_app/model/genre_model.dart';
 import 'package:demo_app/provider/movie_data_provider.dart';
 import 'package:demo_app/services/get_api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -125,8 +127,11 @@ class _WatchDetailState extends State<WatchDetail> {
                 ? Column(
                     children: [Poster(context, value), Details(value)],
                   )
-                : Row(
-                    children: [Poster(context, value), Details(value)],
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [Poster(context, value), Details(value)],
+                    ),
                   ),
       ),
     );
@@ -147,9 +152,10 @@ class _WatchDetailState extends State<WatchDetail> {
               'Genres',
               style: localStyle,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: Row(
+            SizedBox(
+              height: 30,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
                 children: genres
                     .map((e) => Container(
                           decoration: BoxDecoration(
